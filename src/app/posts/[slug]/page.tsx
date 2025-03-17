@@ -53,7 +53,7 @@ export default async function PostDetailPage({ params }: PageProps) {
       <span className="text-subtle mb-1 flex text-sm">{post.date}</span>
       <h1 className="mb-8 text-3xl font-bold">{post.title}</h1>
       <article className="prose dark:prose-invert max-w-none">
-        <Markdown content={post.content} />
+        <Markdown markdown={post.content} />
       </article>
     </main>
   );

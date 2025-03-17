@@ -1,29 +1,32 @@
-"use client";
-
 import rehypeShiki from "@shikijs/rehype";
-import { ExternalLinkIcon } from "lucide-react";
-import { MarkdownAsync } from "react-markdown";
+import { createElement, Fragment } from "react";
+import { jsx, jsxs } from "react/jsx-runtime";
+import rehypeReact from "rehype-react";
+import rehypeSanitize from "rehype-sanitize";
 import remarkGfm from "remark-gfm";
+import remarkParse from "remark-parse";
+import remarkRehype from "remark-rehype";
+import { unified } from "unified";
 
-type MarkdownProps = {
-  content: string;
+const markdownToReact = async (markdown: string) => {
+  const parsed = await unified()
+    .use(remarkParse, { fragment: true })
+    .use(remarkGfm)
+    .use(remarkRehype)
+    .use(rehypeSanitize)
+    .use(rehypeShiki, { theme: "one-dark-pro" })
+    .use(rehypeReact, { Fragment, createElement, jsx, jsxs })
+    .process(markdown);
+
+  return parsed.result;
 };
 
-export const Markdown = ({ content }: MarkdownProps) => {
-  return (
-    <MarkdownAsync
-      components={{
-        a: ({ children, ...props }) => (
-          <a {...props} target="_blank" rel="noopener noreferrer">
-            {children}
-            <ExternalLinkIcon className="ml-2 inline" size={16} />
-          </a>
-        ),
-      }}
-      remarkPlugins={[remarkGfm]}
-      rehypePlugins={[[rehypeShiki, { theme: "one-dark-pro", tabindex: -1 }]]}
-    >
-      {content}
-    </MarkdownAsync>
-  );
+type MarkdownProps = {
+  markdown: string;
+};
+
+export const Markdown = async ({ markdown }: MarkdownProps) => {
+  const content = await markdownToReact(markdown);
+
+  return <>{content}</>;
 };
