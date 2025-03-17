@@ -1,7 +1,8 @@
-import { Footer } from "@/components/footer";
 import "@/styles/globals.css";
 
+import { Footer } from "@/components/footer";
 import { siteConfig } from "@/config/site";
+import { Analytics } from "@vercel/analytics/react";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { Providers } from "./providers";
@@ -23,6 +24,7 @@ export default function RootLayout({
           <div className="container">{children}</div>
           <Footer />
         </Providers>
+        <Analytics />
       </body>
     </html>
   );
