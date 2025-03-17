@@ -24,6 +24,14 @@ export const generateMetadata = async ({ params }: PageProps): Promise<Metadata>
   };
 };
 
+export const generateStaticParams = async () => {
+  return allPosts.map((post) => ({
+    params: {
+      slug: post._meta.path,
+    },
+  }));
+};
+
 export default async function PostDetailPage({ params }: PageProps) {
   const { slug } = await params;
 
