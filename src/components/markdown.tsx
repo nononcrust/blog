@@ -1,3 +1,5 @@
+"use client";
+
 import rehypeShiki from "@shikijs/rehype";
 import { ExternalLinkIcon } from "lucide-react";
 import { MarkdownAsync } from "react-markdown";
