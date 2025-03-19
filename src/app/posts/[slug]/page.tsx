@@ -5,6 +5,7 @@ import { ArrowLeftIcon } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import readingTime from "reading-time";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -41,6 +42,8 @@ export default async function PostDetailPage({ params }: PageProps) {
     return notFound();
   }
 
+  const stats = readingTime(post.content);
+
   return (
     <main className="flex flex-col py-16">
       <Link
@@ -50,8 +53,11 @@ export default async function PostDetailPage({ params }: PageProps) {
         <ArrowLeftIcon size={16} />
         목록으로 돌아가기
       </Link>
-      <span className="text-subtle mb-1 flex text-sm">{post.date}</span>
-      <h1 className="mb-8 text-3xl font-bold">{post.title}</h1>
+
+      <h1 className="mb-1 text-3xl font-bold">{post.title}</h1>
+      <span className="text-subtle mb-8 flex text-sm">
+        {post.date} · {stats.text}
+      </span>
       <article className="prose dark:prose-invert max-w-none">
         <Markdown content={post.content} />
       </article>

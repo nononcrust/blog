@@ -1,5 +1,4 @@
 import { Code } from "bright";
-import { ExternalLinkIcon } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -18,7 +17,6 @@ export const Markdown = ({ content }: MarkdownProps) => {
         a: ({ children, ...props }) => (
           <a {...props} target="_blank" rel="noopener noreferrer">
             {children}
-            <ExternalLinkIcon className="ml-2 inline" size={16} />
           </a>
         ),
       }}
