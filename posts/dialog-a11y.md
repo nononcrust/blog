@@ -1,6 +1,6 @@
 ---
 title: radix primitives로 모달 접근성 고려하기
-date: 2025-03-17
+date: 2025-03-19
 ---
 
 ![모달](/images/alert-dialog.png)
