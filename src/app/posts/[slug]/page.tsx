@@ -47,7 +47,7 @@ export default async function PostDetailPage({ params }: PageProps) {
   return (
     <main className="flex flex-col py-16">
       <Link
-        className="text-subtle hover:text-main mb-8 flex items-center gap-1.5 text-[15px] font-medium transition-colors"
+        className="text-subtle hover:text-main mb-8 flex w-fit items-center gap-1.5 text-[15px] font-medium transition-colors"
         href="/posts"
       >
         <ArrowLeftIcon size={16} />
