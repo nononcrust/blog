@@ -1,6 +1,5 @@
+import { MDXContent } from "@content-collections/mdx/react";
 import { Code } from "bright";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 
 Code.theme = "one-dark-pro";
 Code.lineNumbers = true;
@@ -11,7 +10,8 @@ type MarkdownProps = {
 
 export const Markdown = ({ content }: MarkdownProps) => {
   return (
-    <ReactMarkdown
+    <MDXContent
+      code={content}
       components={{
         pre: Code,
         a: ({ children, ...props }) => (
@@ -20,9 +20,6 @@ export const Markdown = ({ content }: MarkdownProps) => {
           </a>
         ),
       }}
-      remarkPlugins={[remarkGfm]}
-    >
-      {content}
-    </ReactMarkdown>
+    />
   );
 };

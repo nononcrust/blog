@@ -59,7 +59,7 @@ export default async function PostDetailPage({ params }: PageProps) {
         {post.date} · {stats.text}
       </span>
       <article className="prose dark:prose-invert max-w-none">
-        <Markdown content={post.content} />
+        <Markdown content={post.mdx} />
       </article>
     </main>
   );
