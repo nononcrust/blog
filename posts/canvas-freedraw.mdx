@@ -1,0 +1,146 @@
+---
+title: canvas 태그를 활용하여 칠판 기능 구현하기
+date: 2025-04-03
+---
+
+제가 개발에 참여하고 있는 디지털 교과서 서비스에서는 교사와 학생이 실시간으로 교과서를 같이 보며 수업을 진행할 수 있는 환경을 제공하고 있습니다. 수업을 원할하게 진행할 수 있게 하는 다양한 기능 중 교사가 칠판과 같이 활용할 수 있도록 화면에 그림을 그릴 수 있는 기능도 있는데요, 이번 포스팅에서는 이 그리기 기능을 구현한 과정 중 일부에 대해 정리해보려고 합니다.
+
+마우스 혹은 터치로 그리기를 구현할 때는 일반적으로 `canvas` 태그를 사용합니다. 마우스를 클릭하거나 터치를 했을 때 발생하는 이벤트를 받아 캔버스가 제공하는 API를 활용하여 그리기를 구현할 수 있습니다.
+
+## 직선 그리기
+
+직선은 두 점의 집합으로 표현됩니다. canvas의 `lineTo`를 사용하여 두 점을 잇는 직선을 그릴 수 있습니다. 마우스를 클릭했을 때의 좌표를 시작점으로 하고, 마우스를 떼었을 때의 좌표를 끝점으로 하여 직선을 그릴 수 있습니다.
+
+```ts
+export type Point = {
+  x: number;
+  y: number;
+};
+
+export const renderLineShape = (
+  points: [Point, Point],
+  context: CanvasRenderingContext2D,
+) => {
+  context.beginPath();
+  context.moveTo(points[0].x, points[0].y);
+  context.lineTo(points[1].x, points[1].y);
+  context.stroke();
+};
+```
+
+## 곡선 그리기
+
+사용자가 마우스 움직임에 따라 자유롭게 그리는 상황에는 곡선을 그려야 하는 경우도 생깁니다. 이런 경우에는, 여러 점들을 서로 이어 그리는 방식으로 곡선을 구현할 수 있습니다. 마우스를 클릭했을 때의 좌표를 시작점으로 하고, 마우스를 움직일 때마다 찍힌 점들을 모두 모아 하나의 선으로 나타내는 것입니다. 다만, 선을 그리는 데에는 최소 2개의 점이 필요하기 때문에 점을 찍을 수 있게 하려면, 점을 찍는 기능을 추가로 구현해주어야 합니다.
+
+```ts
+export const renderFreedrawShape = (
+  points: Point[],
+  context: CanvasRenderingContext2D,
+) => {
+  // 점을 찍은 경우
+  if (points.length === 1) {
+    context.beginPath();
+    context.arc(
+      points[0].x,
+      points[0].y,
+      context.lineWidth / 2,
+      0,
+      Math.PI * 2,
+    );
+    context.fill();
+
+    return;
+  }
+
+  context.beginPath();
+  context.moveTo(points[0].x, points[0].y);
+
+  points.reduce((prevPoint, currentPoint) => {
+    const midX = (prevPoint.x + currentPoint.x) / 2;
+    const midY = (prevPoint.y + currentPoint.y) / 2;
+    context.quadraticCurveTo(prevPoint.x, prevPoint.y, midX, midY);
+
+    return currentPoint;
+  }, points[0]);
+
+  context.stroke();
+};
+```
+
+## quadraticCurveTo vs lineTo
+
+위 코드에서는 `lineTo`가 아닌 `quadraticCureTo`를 사용했는데요. `quadraticCurveTo`는 점 3개를 사용하여 그 중 2개의 점을 잇는 곡선을 그리는 API로, 점 2개를 사용하는 `lineTo`와는 다르게 부드러운 곡선을 그릴 수 있습니다. 쉽게 이해하기 위해 `lineTo`와 `quadraticCurveTo`를 각각 사용하여 원을 그려보았습니다.
+
+<img
+  src="/images/freedraw-curve.png"
+  alt="lineTo와 quadraticCurve로 그린 원"
+  width={1932}
+  height={464}
+/>
+
+두 동그라미 모양의 차이가 보이시나요? 점과 점을 직선으로 잇게 되면 왼쪽 원과 같이 `aliasing` (계단 현상)이 발생합니다. 이 현상은 사용자가 마우스를 빠르게 움직여 점과 점 사이의 간격이 넓어질수록 더 두드러지게 나타납니다. 이 문제를 해결하기 위해 곡선을 그릴 때에는 `lineTo`가 아닌 `quadraticCurveTo`를 사용하는 것이 좋습니다.
+
+위와 같이 캔버스에 선을 렌더링하는 기능을 구현했으면, 포인터 관련 이벤트를 받아 canvas 태그에 렌더링하여 마우스로 그림을 그릴 수 있게 됩니다.
+
+## 성능 최적화하기
+
+모든 `pointermove` 이벤트에 대해서 그리기를 하게 되면 불필요한 그리기 작업이 발생할 수 있습니다. 예를 들어, 마우스를 클릭한 상태에서 아주 천천히 움직인다면 실제로는 매우 짧은 선 하나를 그렸지만 기록된 좌표를 확인해보면 수백 개의 좌표가 찍혀있을 수 있습니다. 태블릿에서 확인해봤을 때, 성능적인 문제가 발생하지는 않았는데요. 다만, 그리기한 내역을 웹소켓을 통해 실시간으로 공유하는 과정에서 페이로드의 사이즈가 불필요하게 커지는 문제가 있었습니다.
+
+이 문제를 해결하기 위해 일정 이상의 거리를 이동했을 때만 그리기를 하여 최적화해볼 수 있습니다. 여기서 이동한 거리를 넓게 설정할수록 성능은 좋아지지만 선의 퀄리티는 떨어지게 됩니다. 그렇기 때문에 성능과 퀄리티를 적절히 조절할 수 있는 값을 찾는 것이 중요합니다. 제가 직접 값을 조정해가며 테스트해본 결과로는 `2` 정도가 적절한 것으로 보였습니다.
+
+```ts
+export const detectPointerMove = (cp1: Point, cp2: Point) => {
+  const hasPointerMoved =
+    Math.abs(cp2.x - cp1.x) > POINTER_MOVE_THRESHOLD ||
+    Math.abs(cp2.y - cp1.y) > POINTER_MOVE_THRESHOLD;
+
+  return hasPointerMoved;
+};
+```
+
+## 그리기 내역 되돌리기
+
+사용자가 그린 내역을 어떻게 되돌릴 수 있을까요? 먼저, 한번 그리기 시작하고 나서 떼었을 때 까지의 내역을 하나의 요소로 간주하여 관리해야 합니다. 하나의 그리기 요소가 추가될 때마다, 해당 요소를 스택 자료구조에 추가하여 사용자가 그린 내역을 추적할 수 있습니다. 그 이후에는 Undo를 했을 때 단순히 스택에서 요소를 제거하기만 하면 됩니다. 중요한 점은, Undo한 내역을 다시 Redo할 수 있도록 하기 위해서 Undo한 요소를 따로 스택에 저장해두어야 합니다.
+
+```ts
+type ElementType = "line" | "freedraw";
+
+type SketchpadElement = LineElement | FreedrawElement;
+
+type Element = {
+  x: number;
+  y: number;
+  strokeColor: string;
+  strokeWidth: number;
+  opacity: number;
+};
+
+type LineElement = {
+  type: "line";
+  points: [Point, Point];
+} & Element;
+
+type FreedrawElement = {
+  type: "freedraw";
+  points: Point[];
+} & Element;
+```
+
+```ts
+type History = SketchpadElement[];
+
+const historyStack: History = [];
+const undoStack: History = [];
+
+const undo = () => {
+  const lastHistory = history.pop();
+  undoStack.push(lastHistory);
+};
+
+const redo = () => {
+  const lastUndo = undoStack.pop();
+  historyStack.push(lastUndo);
+};
+```
+
+canvas 태그가 제공하는 API를 잘 활용하면 그리기한 내역을 지우는 지우개 기능, 선 두께와 색상 설정 등 다양한 기능을 추가할 수 있습니다. 그리기 기능을 직접 구현하는 방법 외에도 `excalidraw`, `tldraw`, `perfect-freehand` 등 오픈소스 라이브러리들도 많이 존재하니 참고해보시면 좋을 것 같습니다.
