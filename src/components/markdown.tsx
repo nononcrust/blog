@@ -15,7 +15,12 @@ export const Markdown = ({ content }: MarkdownProps) => {
       components={{
         pre: Code,
         a: ({ children, ...props }) => (
-          <a {...props} target="_blank" rel="noopener noreferrer">
+          <a
+            className="break-all"
+            target="_blank"
+            rel="noopener noreferrer"
+            {...props}
+          >
             {children}
           </a>
         ),
