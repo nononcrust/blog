@@ -3,7 +3,14 @@ title: axios 사용성 개선하기
 date: 2025-03-14
 ---
 
-axios는 http 요청을 쉽게 처리할 수 있도록 도와주는 라이브러리입니다. 인터셉터, 타임아웃 등 편리한 기능들을 제공해주기 때문에 많은 프로젝트에서 사용되고 있습니다. axios를 사용해보면 몇가지 불편한 점을 느낄 수 있는데, 아래는 이를 개선해주는 코드입니다.
+axios는 http 요청을 쉽게 처리할 수 있도록 도와주는 라이브러리입니다. 인터셉터, 타임아웃 등 편리한 기능들을 제공해주기 때문에 많은 프로젝트에서 사용되고 있습니다. 저도 axios를 많은 프로젝트에서 활용하고 있는데요, axios를 사용할 때 생기는 몇 가지 문제점을 간단하게 개선할 수 있는 방법을 정리해보려고 합니다.
+
+제가 axios를 직접 사용해보며 겪은 문제점은 다음과 같습니다.
+
+- response data의 타입이 `any`로 추론됩니다.
+- data를 참조하기 위한 중복 코드가 지속적으로 발생합니다.
+
+이런 문제들을 해결하기 위해 axios의 메소드들을 래핑하는 유틸리티 함수를 만들어 활용해볼 수 있습니다.
 
 ```ts
 const apiClient = axios.create({
@@ -11,31 +18,45 @@ const apiClient = axios.create({
 });
 
 const api = {
-  get: async <TResponse = unknown>(...args: Parameters<AxiosInstance["get"]>) => {
+  get: async <TResponse = unknown>(
+    ...args: Parameters<AxiosInstance["get"]>
+  ) => {
     const response = await apiClient.get<TResponse>(...args);
     return response.data;
   },
-  post: async <TResponse = unknown>(...args: Parameters<AxiosInstance["post"]>) => {
+  post: async <TResponse = unknown>(
+    ...args: Parameters<AxiosInstance["post"]>
+  ) => {
     const response = await apiClient.post<TResponse>(...args);
     return response.data;
   },
-  put: async <TResponse = unknown>(...args: Parameters<AxiosInstance["put"]>) => {
+  put: async <TResponse = unknown>(
+    ...args: Parameters<AxiosInstance["put"]>
+  ) => {
     const response = await apiClient.put<TResponse>(...args);
     return response.data;
   },
-  patch: async <TResponse = unknown>(...args: Parameters<AxiosInstance["patch"]>) => {
+  patch: async <TResponse = unknown>(
+    ...args: Parameters<AxiosInstance["patch"]>
+  ) => {
     const response = await apiClient.patch<TResponse>(...args);
     return response.data;
   },
-  postForm: async <TResponse = unknown>(...args: Parameters<AxiosInstance["postForm"]>) => {
+  postForm: async <TResponse = unknown>(
+    ...args: Parameters<AxiosInstance["postForm"]>
+  ) => {
     const response = await apiClient.postForm<TResponse>(...args);
     return response.data;
   },
-  patchForm: async <TResponse = unknown>(...args: Parameters<AxiosInstance["patchForm"]>) => {
+  patchForm: async <TResponse = unknown>(
+    ...args: Parameters<AxiosInstance["patchForm"]>
+  ) => {
     const response = await apiClient.patchForm<TResponse>(...args);
     return response.data;
   },
-  delete: async <TResponse = unknown>(...args: Parameters<AxiosInstance["delete"]>) => {
+  delete: async <TResponse = unknown>(
+    ...args: Parameters<AxiosInstance["delete"]>
+  ) => {
     const response = await apiClient.delete<TResponse>(...args);
     return response.data;
   },
@@ -44,8 +65,8 @@ const api = {
 
 ## 무엇을 하는 코드인가요?
 
-- axios의 메소드들이 기본적으로 any를 리턴하는 부분을 unknown으로 개선해줍니다.
-- response.data를 참조하는 중복 코드를 완화해줍니다.
+- axios의 메소드들이 기본적으로 `any`를 리턴하는 부분을 `unknown`으로 개선해줍니다.
+- data를 참조하는 중복 코드를 완화해줍니다.
 
 ```ts
 // 개선 전
