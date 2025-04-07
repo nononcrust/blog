@@ -2,6 +2,7 @@ import "@/styles/globals.css";
 
 import { Footer } from "@/components/footer";
 import { siteConfig } from "@/config/site";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { Analytics } from "@vercel/analytics/react";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
@@ -18,13 +19,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" suppressHydrationWarning className={`${pretendard.variable} font-pretendard`}>
+    <html
+      lang="ko"
+      suppressHydrationWarning
+      className={`${pretendard.variable} font-pretendard`}
+    >
       <body className="antialiased">
         <Providers>
           <div className="container">{children}</div>
           <Footer />
         </Providers>
         <Analytics />
+        <GoogleAnalytics gaId={process.env.GA_ID!} />
       </body>
     </html>
   );
