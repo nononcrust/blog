@@ -1,0 +1,124 @@
+---
+title: 모노레포를 사용하여 프로젝트 간 패키지 공유하기
+date: 2025-03-28
+---
+
+이번 포스팅에서는 진행 중인 프로젝트에 모노레포를 도입하여 어떤 문제를 해결했는지에 대해 정리해보려고 합니다.
+
+## 모노레포 도입 배경
+
+제가 진행 중인 프로젝트는 교사와 학생이 사용하는 웹 애플리케이션입니다. 프로젝트 특성 상 교사용 웹과 학생용 웹은 각각 다른 React 프로젝트로 구성되어 있는데요, 서로 다른 프로젝트이지만 실제로는 꽤 많은 코드가 각 프로젝트에 동일하게 작성되고 있었습니다. 직접 확인해본 결과 아래와 같은 유형의 코드들이 중복되어 나타나고 있었습니다.
+
+- UI 컴포넌트 (Button, Input 등)
+- 디자인 토큰 변수
+- API 관련 인터페이스
+- 특정 기능과 관련된 컴포넌트, 커스텀 훅
+- 이미지, 아이콘 등 정적 파일
+- eslint, prettier, typescript 등 개발 관련 설정
+
+이런 중복된 코드들로 인해 여러 문제점이 발생하고 있었습니다. 하나의 변경사항을 반영하기 위해 두 군데에서 코드를 모두 수정해야 했고 코드 변경 시 실수로 한 쪽만 수정하고 다른 쪽은 수정하지 않는 경우도 발생했습니다. 또한 공유되는 코드들이 의존하고 있는 패키지 버전이 서로 다를 경우, 각 프로젝트에서 사용하는 패키지 버전도 개발자가 직접 관리해야 했습니다. 이러한 문제들을 해결하기 위해 모노레포를 도입하기로 결정했습니다.
+
+## Turborepo를 사용한 모노레포 구성
+
+Turborepo는 Vercel에서 만든 모노레포 관리 도구입니다. 캐싱, 병렬 실행 등 성능 최적화를 위한 다양한 기능을 제공하고 있고 러닝 커브 없이 빠르게 구성하여 간단하게 사용할 수 있습니다.
+
+Turborepo에서 제공하는 기본적인 모노레포 구조는 다음과 같습니다.
+
+- Application Packages: Next.js와 같이 워크스페이스로부터 배포되는 패키지 (`./apps`)
+- Library Packages: 워크스페이스 내에서 공유되는 패키지 (`./packages`)
+
+이 구조를 바탕으로 프로젝트의 폴더 구조를 아래와 같이 구성했습니다.
+
+```plaintext
+/
+├─ apps/
+│  └─ student/ <-- 학생용 웹
+|  └─ teacher/ <-- 교사용 웹
+├─ packages/
+│  └─ eslint-config
+│  └─ typescript-config
+│  └─ shared/ <-- 공유 패키지
+│     └─ src/
+│        └─ assets/
+│        └─ components/
+│        └─ configs/
+│        └─ features/
+│        └─ hooks/
+│        └─ lib/
+│        └─ services/
+│        └─ styles/
+```
+
+## Turborepo의 패키지 공유 방식
+
+Turborepo에서는 패키지를 공유하는 방식에는 크게 두 가지가 있습니다.
+
+### Just-in-Time Packages
+
+패키지를 사용하는 하는 앱에서 직접 컴파일하는 방식입니다. 빌드 과정이 필요없고 간단한 설정으로 패키지를 공유할 수 있지만, Turborepo의 캐싱 기능을 활용할 수 없고 번들러가 제공하는 여러 기능을 사용할 수 없다는 단점이 있습니다.
+
+```json
+// package.json
+
+{
+  "name": "@repo/ui",
+  "exports": {
+    "./button": "./src/button.tsx",
+    "./card": "./src/card.tsx"
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings 0",
+    "check-types": "tsc --noEmit"
+  }
+}
+```
+
+### Compiled Packages
+
+JIT 방식과는 반대로 빌드 툴을 사용하여 패키지를 미리 컴파일하여 공유하는 방식입니다. 아래와 같이 컴파일된 파일과 타입 정의를 따로 내보내는 방식으로 설정할 수 있습니다.
+
+```json
+// package.json
+
+{
+  "name": "@repo/ui",
+  "exports": {
+    "./button": {
+      "types": "./src/button.tsx",
+      "default": "./dist/button.js"
+    },
+    "./card": {
+      "types": "./src/card.tsx",
+      "default": "./dist/card.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc"
+  }
+}
+```
+
+```json
+{
+  "name": "@repo/shared",
+  "exports": {
+    "./components/ui": "./src/components/ui/index.ts"
+  }
+}
+```
+
+각 방식이 가지는 장단점이 있지만, 저희 프로젝트에서는 프로젝트 간 환경이 유사하고 간단하게 코드를 공유할 수 있는 방식을 찾고 있었기 때문에 첫 번째 방법을 활용하여 패키지를 공유할 수 있도록 구성했습니다. 이제 프로젝트 간 공유되는 패키지를 아래와 같이 `@repo/shared`로부터 import할 수 있게 되었습니다.
+
+```tsx
+// apps/teacher 혹은 apps/student
+
+import { Button } from "@repo/shared/components/ui";
+
+const Page = () => {
+  return <Button>버튼</Button>;
+};
+```
+
+## 모노레포 도입 후 변화
+
+모노레포를 도입한 이후에 지금까지 약 16000줄 정도의 중복된 코드를 제거할 수 있었습니다. 아직 패키지로 분리하지 못한 코드들도 있지만, 앞으로 점진적으로 패키지로 분리해나갈 예정입니다.
