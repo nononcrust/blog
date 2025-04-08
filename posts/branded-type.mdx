@@ -1,0 +1,90 @@
+---
+title: Branded Type을 활용하여 런타임 안정성 개선하기
+date: 2025-04-08
+---
+
+이번 포스팅에서는 Branded Type이 무엇이고 어떻게 런타임 안정성을 개선할 수 있는지에 대해 적어보려고 합니다. Branded Type은 어떤 값을 잘못된 맥락에서 사용하지 않도록 도와줍니다. 또한, 명시적 타입 시스템의 장점을 빌려 개발자가 더 명확한 코드를 작성할 수 있게 해줍니다.
+
+## 구조적 타입 시스템의 문제점
+
+타입스크립트는 기본적으로 구조적으로 동작합니다. 즉, 타입스크립트에서 두 타입이 구조적으로 같다면 같은 타입으로 취급한다는 것입니다. 구조적 타입 시스템은 유연하게 코드를 작성할 수 있도록 도와주고 생산성을 높여주지만, 그에 따른 단점도 존재합니다.
+
+예를 들어, 다음과 같은 코드가 있다고 가정해보겠습니다.
+
+```ts
+type UserId = number;
+
+type ClassId = number;
+
+const getUserById = (id: UserId) => {
+  // 유저 상세 정보를 불러오는 로직
+};
+
+const getClassById = (id: ClassId) => {
+  // 학급 상세 정보를 불러오는 로직
+};
+
+const id: UserId = 1;
+
+getClassById(id); // 잘못된 ID를 전달했지만 컴파일 에러가 발생하지 않음
+```
+
+여기서 함수에 잘못된 ID를 전달하는 것이 논리적으로 잘못되었지만 타입 에러가 발생하지 않습니다. `UserId`와 `ClassId`가 구조적으로 같기 때문입니다. 위와 같이 간단한 예제에서는 단순히 올바른 ID를 전달하도록 수정하면 해결되는 문제입니다.
+
+하지만 이런 문제는 도메인이 복잡해질수록 두드러지게 나타납니다. 단순히 ID 뿐만이 아니라 구조적으로 동일한 타입을 공유하는 다양한 곳에서 잘못된 값을 전달할 수 있습니다. 어떤 함수의 매개변수명이 모호하게 작성되어있을 수도 있고, 새로 온보딩한 개발자가 도메인에 대한 이해가 부족한 상태에서 코드를 작성하거나 할 때에도 비슷한 문제가 발생할 수 있습니다.
+
+이런 문제를 해결하기 위해 인터섹션을 사용하여 타입스크립트에서 명시적 타입과 유사하게 동작하도록 구현할 수 있습니다.
+
+```ts
+declare const __brand: unique symbol;
+type Brand<B> = { [__brand]: B };
+export type Branded<T, B> = T & Brand<B>;
+```
+
+```ts
+type UserId = Branded<number, "UserId">;
+type ClassId = Branded<number, "ClassId">;
+
+getClassById(userId); // 어디선가 가져온 유저 ID를 인자로 전달하면 아래와 같이 타입 에러가 발생합니다.
+/**
+ * Argument of type 'UserId' is not assignable to parameter of type 'PostId'.
+ */
+```
+
+이렇게 Branded Type을 사용하면 타입스크립트가 구조적으로 동일한 타입을 구분할 수 있게 됩니다. 즉, `UserId`와 `ClassId`는 구조적으로 같지만 서로 다른 타입으로 취급됩니다. 따라서 잘못된 ID를 전달했을 때 타입 에러가 발생하게 되어 런타임 이전에 문제를 발견할 수 있습니다.
+
+## 날짜 타입에 활용해보기
+
+진행중인 프로젝트에서는 여러 API로부터 날짜 관련 데이터를 받아오고 있기 때문에 내부적으로 다양한 날짜 형식을 다루고 있습니다. 이로 인해 잘못된 날짜를 전달하는 경우도 자주 발생했었는데요. Branded Type을 활용하여 날짜 형식에 대한 타입을 정의하고, 이를 통해 잘못된 날짜 형식이 전달되는 것을 방지할 수 있었습니다.
+
+```ts
+type ISOString = Branded<string, "ISOString">; // ISO 형식의 문자열
+type DateString = Branded<string, "DateString">; // yyyyMMdd 형식의 문자열
+type DateTimeString = Branded<string, "DateTimeString">; // yyyyMMddHHmmss 형식의 문자열
+
+// ISO 형식의 문자열을 yyyyMMdd 형식으로 변환합니다.
+const convertISODateToDateString = (date: ISOString): DateString => {
+  // ...
+};
+```
+
+## zod에서 Branded Type 사용하기
+
+zod에서도 brand 메소드를 통해 Branded Type을 지원하고 있습니다.
+
+```ts
+const ISOString = z.string().brand<"ISOString">();
+type ISOString = z.infer<typeof ISOString>;
+
+type Post = {
+  createdAt: ISOString;
+};
+```
+
+실제로 사용해본 경험에 비추어 보았을 때 Branded Type이 만능은 아닙니다. 모든 개발자가 해당 코드를 이해하고 있어야 하고, 남용했을 경우에 프로젝트 복잡도만 증가시킬 수 있습니다. 그렇기 떄문에 장점과 단점을 잘 고려하여 상황에 맞게 사용하는 것이 중요하다고 생각합니다.
+
+## 관련 링크
+
+- https://www.learningtypescript.com/articles/branded-types
+- https://egghead.io/blog/using-branded-types-in-typescript
+- https://effect.website/docs/code-style/branded-types/
