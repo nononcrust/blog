@@ -63,7 +63,7 @@ type DateString = Branded<string, "DateString">; // yyyyMMdd 형식의 문자열
 type DateTimeString = Branded<string, "DateTimeString">; // yyyyMMddHHmmss 형식의 문자열
 
 // ISO 형식의 문자열을 yyyyMMdd 형식으로 변환합니다.
-const convertISODateToDateString = (date: ISOString): DateString => {
+const convertISOStringToDateString = (date: ISOString): DateString => {
   // ...
 };
 ```
