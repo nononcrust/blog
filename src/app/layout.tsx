@@ -1,7 +1,7 @@
 import "@/styles/globals.css";
 
 import { Footer } from "@/components/footer";
-import { siteConfig } from "@/config/site";
+import { siteConfig } from "@/configs/site";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Analytics } from "@vercel/analytics/react";
 import type { Metadata } from "next";

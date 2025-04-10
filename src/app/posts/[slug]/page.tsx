@@ -1,5 +1,5 @@
 import { Markdown } from "@/components/markdown";
-import { siteConfig } from "@/config/site";
+import { siteConfig } from "@/configs/site";
 import { allPosts } from "content-collections";
 import { ArrowLeftIcon } from "lucide-react";
 import { Metadata } from "next";
@@ -11,7 +11,9 @@ type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export const generateMetadata = async ({ params }: PageProps): Promise<Metadata> => {
+export const generateMetadata = async ({
+  params,
+}: PageProps): Promise<Metadata> => {
   const { slug } = await params;
 
   const post = allPosts.find((post) => post._meta.path === slug);
