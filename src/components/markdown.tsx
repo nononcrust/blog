@@ -13,6 +13,9 @@ export const Markdown = ({ content }: MarkdownProps) => {
     <MDXContent
       code={content}
       components={{
+        Image: ({ src, alt, ...props }) => (
+          <img className="rounded-md" src={src} alt={alt} {...props} />
+        ),
         pre: Code,
         a: ({ children, ...props }) => (
           <a
