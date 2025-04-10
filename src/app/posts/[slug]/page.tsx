@@ -1,5 +1,5 @@
 import { Markdown } from "@/components/markdown";
-import { siteConfig } from "@/configs/site";
+import { site } from "@/configs/site";
 import { allPosts } from "content-collections";
 import { ArrowLeftIcon } from "lucide-react";
 import { Metadata } from "next";
@@ -23,7 +23,7 @@ export const generateMetadata = async ({
   }
 
   return {
-    title: `${post.title} | ${siteConfig.title}`,
+    title: `${post.title} | ${site.title}`,
   };
 };
 

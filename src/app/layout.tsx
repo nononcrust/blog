@@ -1,7 +1,8 @@
 import "@/styles/globals.css";
 
+import profileImage from "@/assets/images/profile-image.jpg";
 import { Footer } from "@/components/footer";
-import { siteConfig } from "@/configs/site";
+import { site } from "@/configs/site";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Analytics } from "@vercel/analytics/react";
 import type { Metadata } from "next";
@@ -9,8 +10,14 @@ import localFont from "next/font/local";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
-  title: siteConfig.title,
-  description: siteConfig.description,
+  title: site.title,
+  description: site.description,
+  openGraph: {
+    images: profileImage.src,
+  },
+  twitter: {
+    images: profileImage.src,
+  },
 };
 
 export default function RootLayout({
