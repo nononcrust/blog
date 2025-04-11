@@ -8,6 +8,15 @@ date: 2025-03-17
 이런 문제가 발생하는 근본적인 원인은 추론된 타입이 실제 값과 다른 경우가 있기 때문입니다. 아래와 같이 여러 게시글 중 첫 번째 게시글의 제목을 표시하는 코드가 있다고 가정해보겠습니다.
 
 ```tsx
+type Post = {
+  id: number;
+  title: string;
+};
+
+const getPosts = (): Post[] => {
+  // 게시글 목록을 가져오는 로직
+};
+
 const posts = getPosts();
 
 const firstPost = posts[0]; // Post
