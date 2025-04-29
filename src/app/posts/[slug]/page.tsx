@@ -19,7 +19,10 @@ export const generateMetadata = async ({
   const post = allPosts.find((post) => post._meta.path === slug);
 
   if (!post) {
-    throw new Error("게시글을 찾을 수 없습니다.");
+    return {
+      title: site.title,
+      description: site.description,
+    };
   }
 
   return {
