@@ -48,21 +48,27 @@ export default async function PostDetailPage({ params }: PageProps) {
 
   return (
     <main className="flex flex-col py-16">
-      <Link
-        className="text-subtle hover:text-main mb-8 flex w-fit items-center gap-1.5 text-[15px] font-medium transition-colors"
-        href="/posts"
-      >
-        <ArrowLeftIcon size={16} />
-        목록으로 돌아가기
-      </Link>
-
-      <h1 className="mb-1 text-3xl font-bold">{post.title}</h1>
+      <ReturnToList />
+      <h1 className="mt-8 mb-1 text-3xl font-bold">{post.title}</h1>
       <span className="text-subtle mb-8 flex text-sm">
         {post.date} · {stats.text}
       </span>
-      <article className="prose dark:prose-invert max-w-none">
+      <article className="prose dark:prose-invert mb-8 max-w-none">
         <Markdown content={post.mdx} />
       </article>
+      <ReturnToList />
     </main>
   );
 }
+
+const ReturnToList = () => {
+  return (
+    <Link
+      className="text-subtle hover:text-main flex w-fit items-center gap-1.5 text-[15px] font-medium transition-colors"
+      href="/posts"
+    >
+      <ArrowLeftIcon size={16} />
+      목록으로 돌아가기
+    </Link>
+  );
+};

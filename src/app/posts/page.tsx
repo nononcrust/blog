@@ -1,4 +1,5 @@
 import { Post } from "@/components/post";
+import { Profile } from "@/components/profile";
 import { allPosts } from "content-collections";
 
 export default function PostListPage() {
@@ -6,7 +7,8 @@ export default function PostListPage() {
 
   return (
     <main className="mt-8 mb-16 md:mt-32">
-      <ul className="space-y-4">
+      <Profile />
+      <ul className="mt-16 space-y-4">
         {posts.map((post) => (
           <Post
             key={post._meta.path}

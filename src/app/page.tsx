@@ -1,26 +1,15 @@
-import profileImage from "@/assets/images/profile-image.jpg";
+import { Contact } from "@/components/contact";
 import { Post } from "@/components/post";
+import { Profile } from "@/components/profile";
 import { allPosts } from "content-collections";
 import { ArrowRightIcon } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 
 export default function Home() {
   return (
     <main className="mt-8 mb-16 md:mt-32">
-      <div className="flex items-center gap-8">
-        <Image
-          className="rounded-full"
-          src={profileImage.src}
-          alt="프로필 이미지"
-          width={100}
-          height={100}
-        />
-        <div className="flex flex-col">
-          <h1 className="text-2xl font-medium">신상호</h1>
-          <span className="text-sub mt-1">Frontend Developer</span>
-        </div>
-      </div>
+      <Profile />
+      <Contact />
       <RecentPosts />
     </main>
   );
