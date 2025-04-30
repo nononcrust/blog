@@ -9,9 +9,9 @@ type PostProps = {
 export const Post = ({ title, date, href }: PostProps) => {
   return (
     <li className="flex flex-col">
-      <span className="text-subtle text-[13px]">{date}</span>
+      <span className="text-subtle text-[0.8125rem]">{date}</span>
       <Link
-        className="w-fit text-[15px] font-medium hover:underline"
+        className="w-fit text-[0.9375rem] font-medium hover:underline"
         href={href}
       >
         {title}

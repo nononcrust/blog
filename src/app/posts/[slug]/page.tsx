@@ -67,10 +67,10 @@ export default async function PostDetailPage({ params }: PageProps) {
 const ReturnToList = () => {
   return (
     <Link
-      className="text-subtle hover:text-main flex w-fit items-center gap-1.5 text-[15px] font-medium transition-colors"
+      className="text-subtle hover:text-main flex w-fit items-center gap-1.5 text-[0.9375rem] font-medium transition-colors"
       href="/posts"
     >
-      <ArrowLeftIcon size={16} />
+      <ArrowLeftIcon className="size-4" />
       목록으로 돌아가기
     </Link>
   );

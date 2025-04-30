@@ -6,11 +6,12 @@ export const Profile = () => {
   return (
     <div className="flex items-center gap-8">
       <Image
-        className="h-[100px] w-[100px] rounded-full"
+        className="h-[6.25rem] w-[6.25rem] rounded-full"
         src={profileImage.src}
         alt="프로필 이미지"
         width={100}
         height={100}
+        priority
       />
       <div className="flex flex-col">
         <h1 className="w-fit text-2xl font-medium">

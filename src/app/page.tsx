@@ -25,11 +25,11 @@ const RecentPosts = () => {
       <div className="mt-16 flex items-center justify-between">
         <h2 className="text-xl font-medium">최근 포스팅</h2>
         <Link
-          className="text-subtle hover:text-main flex w-fit items-center gap-1.5 text-[15px] font-medium transition-colors"
+          className="text-subtle hover:text-main flex w-fit items-center gap-1.5 text-[0.9375rem] font-medium transition-colors"
           href="/posts"
         >
           전체보기
-          <ArrowRightIcon size={16} />
+          <ArrowRightIcon className="size-4" />
         </Link>
       </div>
       <ul className="mt-8 space-y-4">

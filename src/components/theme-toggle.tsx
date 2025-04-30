@@ -8,14 +8,20 @@ export const ThemeToggle = () => {
   const { resolvedTheme, setTheme } = useTheme();
 
   return (
-    <ClientOnly>
-      <button
-        className="border-border hover:bg-background-hover flex size-8 items-center justify-center rounded-lg border transition-colors"
-        aria-label="테마 변경"
-        onClick={() => setTheme(resolvedTheme === "light" ? "dark" : "light")}
-      >
-        {resolvedTheme === "light" ? <SunIcon size={16} /> : <MoonIcon size={16} />}
-      </button>
-    </ClientOnly>
+    <div className="size-8">
+      <ClientOnly>
+        <button
+          className="border-border hover:bg-background-hover flex size-8 items-center justify-center rounded-lg border transition-colors"
+          aria-label="테마 변경"
+          onClick={() => setTheme(resolvedTheme === "light" ? "dark" : "light")}
+        >
+          {resolvedTheme === "light" ? (
+            <SunIcon className="size-4" />
+          ) : (
+            <MoonIcon className="size-4" />
+          )}
+        </button>
+      </ClientOnly>
+    </div>
   );
 };
