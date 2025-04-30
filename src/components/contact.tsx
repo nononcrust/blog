@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export const Contact = () => {
   return (
-    <div className="mt-8 grid grid-cols-[80px_1fr] gap-3">
+    <dl className="mt-8 grid grid-cols-[80px_1fr] gap-3">
       <dd className="text-subtle">Email</dd>
       <dt className="font-medium">
         <Link
@@ -20,6 +20,6 @@ export const Contact = () => {
           {site.nickname}
         </Link>
       </dt>
-    </div>
+    </dl>
   );
 };
