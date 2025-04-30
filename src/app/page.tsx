@@ -1,3 +1,4 @@
+import { About } from "@/components/about";
 import { Contact } from "@/components/contact";
 import { Post } from "@/components/post";
 import { Profile } from "@/components/profile";
@@ -9,6 +10,7 @@ export default function Home() {
   return (
     <main className="mt-8 mb-16 md:mt-32">
       <Profile />
+      <About />
       <Contact />
       <RecentPosts />
     </main>
