@@ -1,6 +1,7 @@
 "use client";
 
 import { MoonIcon, SunIcon } from "lucide-react";
+import { motion } from "motion/react";
 import { useTheme } from "next-themes";
 import { ClientOnly } from "./client-only";
 
@@ -8,7 +9,12 @@ export const ThemeToggle = () => {
   const { resolvedTheme, setTheme } = useTheme();
 
   return (
-    <div className="size-8">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="size-8"
+    >
       <ClientOnly>
         <button
           className="border-border hover:bg-background-hover flex size-8 items-center justify-center rounded-lg border transition-colors"
@@ -22,6 +28,6 @@ export const ThemeToggle = () => {
           )}
         </button>
       </ClientOnly>
-    </div>
+    </motion.div>
   );
 };
