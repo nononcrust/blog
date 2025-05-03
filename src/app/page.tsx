@@ -2,6 +2,7 @@ import { About } from "@/components/about";
 import { Contact } from "@/components/contact";
 import { Post } from "@/components/post";
 import { Profile } from "@/components/profile";
+import { TransitionMount } from "@/components/transition-mount";
 import { allPosts } from "content-collections";
 import { ArrowRightIcon } from "lucide-react";
 import Link from "next/link";
@@ -9,10 +10,18 @@ import Link from "next/link";
 export default function Home() {
   return (
     <main className="mt-8 mb-16 md:mt-32">
-      <Profile />
-      <About />
-      <Contact />
-      <RecentPosts />
+      <TransitionMount>
+        <Profile />
+      </TransitionMount>
+      <TransitionMount delay={0.07}>
+        <About />
+      </TransitionMount>
+      <TransitionMount delay={0.14}>
+        <Contact />
+      </TransitionMount>
+      <TransitionMount delay={0.21}>
+        <RecentPosts />
+      </TransitionMount>
     </main>
   );
 }

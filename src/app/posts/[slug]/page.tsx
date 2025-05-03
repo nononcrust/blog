@@ -1,4 +1,5 @@
 import { Markdown } from "@/components/markdown";
+import { TransitionMount } from "@/components/transition-mount";
 import { site } from "@/configs/site";
 import { allPosts } from "content-collections";
 import { ArrowLeftIcon } from "lucide-react";
@@ -50,17 +51,19 @@ export default async function PostDetailPage({ params }: PageProps) {
   const stats = readingTime(post.content);
 
   return (
-    <main className="flex flex-col py-16">
-      <ReturnToList />
-      <h1 className="mt-8 mb-1 text-3xl font-bold">{post.title}</h1>
-      <span className="text-subtle mb-8 flex text-sm">
-        {post.date} · {stats.text}
-      </span>
-      <article className="prose dark:prose-invert mb-8 max-w-none">
-        <Markdown content={post.mdx} />
-      </article>
-      <ReturnToList />
-    </main>
+    <TransitionMount delay={0}>
+      <main className="flex flex-col py-16">
+        <ReturnToList />
+        <h1 className="mt-8 mb-1 text-3xl font-bold">{post.title}</h1>
+        <span className="text-subtle mb-8 flex text-sm">
+          {post.date} · {stats.text}
+        </span>
+        <article className="prose dark:prose-invert mb-8 max-w-none">
+          <Markdown content={post.mdx} />
+        </article>
+        <ReturnToList />
+      </main>
+    </TransitionMount>
   );
 }
 
