@@ -4,7 +4,6 @@ import profileImage from "@/assets/images/profile-image.jpg";
 import { Footer } from "@/components/footer";
 import { site } from "@/configs/site";
 import { GoogleAnalytics } from "@next/third-parties/google";
-import { Analytics } from "@vercel/analytics/react";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { Providers } from "./providers";
@@ -36,7 +35,6 @@ export default function RootLayout({
           <div className="container">{children}</div>
           <Footer />
         </Providers>
-        <Analytics />
         <GoogleAnalytics gaId={process.env.GA_ID!} />
       </body>
     </html>
